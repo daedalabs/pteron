@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+.venv/
+.tools/
+
+# Build outputs and distributions
+dist/
+artifacts/
+
+# Python caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+
+# Test & coverage artifacts
+test-results/
+playwright-report/
+blob-report/
+coverage/
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+*.log
+
+

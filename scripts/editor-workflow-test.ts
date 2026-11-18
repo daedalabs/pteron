@@ -1,0 +1,124 @@
+import {_electron as electron} from 'playwright';
+import {resolve} from 'node:path';
+import {mkdir,writeFile} from 'node:fs/promises';
+import assert from 'node:assert/strict';
+import {workerRuntime} from '../electron/runtime';
+import {spawnSync} from 'node:child_process';
+
+const work=resolve('artifacts/editor-workflow');await mkdir(work,{recursive:true});
+const packaged=process.argv.includes('--packaged');
+const app=await electron.launch({...(packaged?{executablePath:resolve('artifacts/standalone/win-unpacked/pteron.exe')}:{}),args:[...(packaged?[]:['.']),`--user-data-dir=${work}/profile-${Date.now()}`]});
+try{
+ const page=await app.firstWindow();page.setDefaultTimeout(15000);const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
+ await page.getByRole('region',{name:'Canvas properties'}).waitFor();
+ const until=async(predicate:()=>Promise<boolean>)=>{const deadline=Date.now()+15000;while(Date.now()<deadline){if(await predicate())return;await new Promise(done=>setTimeout(done,50));}throw new Error('Editor state did not settle');};
+ const state=()=>page.evaluate(()=>window.pteron.call('state'));
+ const command=async(command:unknown)=>{const current=await state();return page.evaluate(({revision,command})=>window.pteron.call('command',{revision,command}),{revision:current.project.revision,command});};
+ let screenId=(await state()).project.screens[0].id;
+ await command({type:'project.settings',width:400,height:300,fps:30});
+ const editor=page.frames().find(frame=>frame.url().endsWith('canvas.html'))!;
+ await editor.waitForFunction(()=>document.querySelector('#svgcontent')?.getAttribute('viewBox')==='0 0 400 300');
+ const tool=(name:string)=>page.getByRole('button',{name,exact:true});
+ await page.locator('.canvas-area').focus();await page.keyboard.press('m');await tool('Rectangle').filter({hasNot:page.locator('[disabled]')}).waitFor();
+ await page.waitForFunction(()=>document.querySelector('[aria-label="Rectangle"]')?.getAttribute('aria-pressed')==='true');
+ await editor.waitForFunction(()=>document.documentElement.dataset.editorMode==='rect');
+ const board=(await page.locator('iframe').boundingBox())!;
+ await page.mouse.move(board.x+board.width*.2,board.y+board.height*.2);await page.mouse.down();await page.mouse.move(board.x+board.width*.5,board.y+board.height*.45,{steps:8});await page.mouse.up();
+ await until(async()=>{const s=await state();return (await page.evaluate(screenId=>window.pteron.call('objects',{screenId}),s.project.screens[0].id)).length===1;});
+ let objects=await page.evaluate(screenId=>window.pteron.call('objects',{screenId}),screenId),rectangle=objects[0];
+ assert.ok(Math.abs(Number(rectangle.attributes.width)-120)<2&&Math.abs(Number(rectangle.attributes.height)-75)<2,'First rectangle follows the pointer');
+ await editor.waitForFunction(()=>document.querySelector('#canvasBackground>rect')?.getAttribute('fill')==='#ffffff');
+ await page.screenshot({path:resolve(work,'first-rectangle.png')});
+ // Tool shortcuts also work inside the iframe and never eat text input.
+ await editor.locator('body').press('l');await editor.waitForFunction(()=>document.documentElement.dataset.editorMode==='ellipse');
+ await editor.locator('body').press('p');await editor.waitForFunction(()=>document.documentElement.dataset.editorMode==='path');
+ await editor.locator('body').press('t');await editor.waitForFunction(()=>document.documentElement.dataset.editorMode==='text');
+ await editor.locator('body').press('v');await editor.waitForFunction(()=>document.documentElement.dataset.editorMode==='select');
+ const name=page.getByLabel('Shape name',{exact:true});await name.fill('mlptv');assert.equal(await tool('Select').getAttribute('aria-pressed'),'true');await name.press('Tab');
+ // Deselecting exposes canvas properties, without adding a rectangle layer.
+ await page.mouse.click(board.x+board.width*.85,board.y+board.height*.85);
+ const canvas=page.getByRole('region',{name:'Canvas properties'});await canvas.waitFor();
+ const hex=canvas.getByLabel('Canvas background hex');await hex.fill('#112233');await hex.press('Enter');
+ await until(async()=>(await state()).project.screens[0].svg.includes('#112233'));
+ await editor.waitForFunction(()=>document.querySelector('#canvasBackground>rect')?.getAttribute('fill')==='rgb(17, 34, 51)');
+ assert.equal((await page.evaluate(screenId=>window.pteron.call('objects',{screenId}),screenId)).length,1);
+ await page.getByRole('button',{name:'Undo',exact:true}).click();await until(async()=>!(await state()).project.screens[0].svg.includes('#112233'));
+ await page.getByRole('button',{name:'Redo',exact:true}).click();await until(async()=>(await state()).project.screens[0].svg.includes('#112233'));
+ // The same background command is available over the real stdio MCP adapter.
+ const beforeMcp=await state(),descriptor=await app.evaluate(({app})=>app.getPath('userData')+'/connection.json');
+ const mcp=spawnSync(process.execPath,['dist/mcp.js'],{input:JSON.stringify({jsonrpc:'2.0',id:1,method:'tools/call',params:{name:'command',arguments:{revision:beforeMcp.project.revision,command:{type:'canvas.background',screenId,color:'#224466'}}}})+'\n',env:{...process.env,PTERON_CONNECTION:descriptor},encoding:'utf8',windowsHide:true,timeout:15000});
+ assert.equal(mcp.status,0,mcp.stderr);const response=JSON.parse(mcp.stdout.trim());assert.ok(!response.result.isError,mcp.stdout);
+ await until(async()=>(await state()).project.screens[0].svg.includes('#224466'));
+ assert.equal((await state()).activity.at(-1).source,'mcp');
+ await page.getByRole('button',{name:'Undo',exact:true}).click();await until(async()=>(await state()).project.screens[0].svg.includes('#112233'));
+ await page.screenshot({path:resolve(work,'canvas-properties.png')});
+ const liveCanvas=resolve(work,'live-background.png');await page.locator('.artboard').screenshot({path:liveCanvas});
+ const python=workerRuntime(resolve('.'),work,false);
+ const liveCheck=spawnSync(python.executable,['-c',"from PIL import Image; import numpy as np,sys; a=np.array(Image.open(sys.argv[1]).convert('RGB')); h,w=a.shape[:2]; mask=(a[:,:,0]>90)&(a[:,:,0]<160)&(a[:,:,1]>75)&(a[:,:,1]<155)&(a[:,:,2]>200); y,x=np.where(mask); assert len(x)>0,'Live canvas background hides the artwork'; actual=np.array([x.min()/w*400,y.min()/h*300,(x.max()+1)/w*400,(y.max()+1)/h*300]); assert np.max(np.abs(actual-[80,60,200,135]))<=1,actual; assert np.max(np.abs(a[-10,-10].astype(int)-[17,34,51]))<=1",liveCanvas],{encoding:'utf8',windowsHide:true,env:{...process.env,...python.env}});
+ if(liveCheck.error)throw liveCheck.error;
+ assert.equal(liveCheck.status,0,liveCheck.stderr);
+ if(process.argv.includes('--render')){
+  await command({type:'screen.update',screenId,duration:3});
+  const output=resolve(work,'canvas-background.mp4');
+  await app.evaluate(({dialog},path)=>{dialog.showSaveDialog=async()=>({canceled:false,filePath:path});},output);
+  const job=await page.evaluate(path=>window.pteron.call('render',{path}),output);
+  let result:any;
+  await until(async()=>{result=(await page.evaluate(()=>window.pteron.call('jobs'))).find((value:any)=>value.id===job.id);return Boolean(result&&result.status!=='running');});
+  assert.equal(result.status,'completed',result.diagnostic);
+  const check=spawnSync(python.executable,['-c',"import av,numpy as np,sys; c=av.open(sys.argv[1]); s=c.streams.video[0]; frames=list(c.decode(video=0)); assert (s.width,s.height,s.average_rate,len(frames))==(400,300,30,3); a=frames[0].to_ndarray(format='rgb24'); assert np.max(np.abs(a[280,380].astype(int)-[17,34,51]))<=5; mask=(a[:,:,0]>90)&(a[:,:,0]<160)&(a[:,:,1]>75)&(a[:,:,1]<155)&(a[:,:,2]>200); y,x=np.where(mask); actual=[x.min(),y.min(),x.max(),y.max()]; assert np.max(np.abs(np.array(actual)-[80,60,199,134]))<=1,actual; print('Canvas background export matches color, geometry and frame clock')",output],{encoding:'utf8',windowsHide:true,env:{...process.env,...python.env}});
+  if(check.error)throw check.error;
+  assert.equal(check.status,0,check.stderr);console.log(check.stdout.trim());
+ }
+ await page.locator('.layers .layer-label').first().click();await page.getByRole('button',{name:'Motion',exact:true}).click();
+ await page.getByRole('button',{name:'Sink',exact:true}).click();
+ const settings=page.getByRole('region',{name:'Transition settings'});await settings.waitFor();
+ const clip=(await state()).project.screens[0].clips[0];
+ await command({type:'clip.put',screenId,clip:{...clip,start:15,duration:12}});
+ await page.locator(`[data-clip-id="${clip.id}"]`).click();
+ const time=await page.locator('.timecode').textContent();
+ await page.locator('.layers .layer-label').first().click();
+ assert.match(await page.locator(`[data-clip-id="${clip.id}"]`).getAttribute('class')??'',/selected/);
+ assert.equal(await page.locator('.timecode').textContent(),time,'Layer click preserves playhead');
+ await page.getByRole('button',{name:'Motion',exact:true}).click();
+ await page.getByRole('button',{name:'Clip',exact:true}).click();await settings.waitFor();
+ const gap=await settings.evaluate(element=>{const time=element.querySelector('.clip-time-fields')!.getBoundingClientRect(),options=element.querySelector('.clip-options')!.getBoundingClientRect();const left=[element.querySelector<HTMLInputElement>('[aria-label="Start"]')!,element.querySelector<HTMLInputElement>('[aria-label="Intensity"]')!].map(input=>input.closest('.number-unit')!.getBoundingClientRect().left);return {vertical:options.top-time.bottom,left};});
+ assert.ok(gap.vertical>=5&&gap.vertical<=8,'Motion rows have an intentional gap');assert.ok(Math.abs(gap.left[0]-gap.left[1])<1,'Motion input columns align');
+ await page.screenshot({path:resolve(work,'motion-spacing.png')});
+ await command({type:'artwork.import',screenId,svg:'<svg xmlns="http://www.w3.org/2000/svg"><ellipse data-name="Other" cx="300" cy="180" rx="35" ry="25" fill="#ff9900"/></svg>'});
+ await page.locator('.layers').getByRole('button',{name:'Other',exact:true}).click();
+ assert.match(await page.locator(`[data-clip-id="${clip.id}"]`).getAttribute('class')??'',/selected/,'Other layer preserves timeline clip selection');
+ // A real second draw after a background edit retains the vector background.
+ await page.locator('.canvas-area').focus();await page.keyboard.press('m');await editor.waitForFunction(()=>document.documentElement.dataset.editorMode==='rect');
+ await page.mouse.move(board.x+board.width*.65,board.y+board.height*.1);await page.mouse.down();await page.mouse.move(board.x+board.width*.85,board.y+board.height*.3,{steps:6});await page.mouse.up();
+ await until(async()=>{const s=await state();return (await page.evaluate(screenId=>window.pteron.call('objects',{screenId}),s.project.screens[0].id)).length===3;});
+ assert.match((await state()).project.screens[0].svg,/pteron-canvas-background/);assert.deepEqual(errors,[]);
+ // A background on an otherwise empty screen must leave an editable foreground layer.
+ await command({type:'project.create',name:'Background first',width:400,height:300});screenId=(await state()).project.screens[0].id;
+ await command({type:'canvas.background',screenId,color:'#345678'});
+ await editor.waitForFunction(()=>document.querySelector('.pteron-canvas-background')?.getAttribute('fill')==='#345678');
+ await page.locator('.canvas-area').focus();await page.keyboard.press('m');await editor.waitForFunction(()=>document.documentElement.dataset.editorMode==='rect');
+ await page.mouse.move(board.x+board.width*.2,board.y+board.height*.2);await page.mouse.down();await page.mouse.move(board.x+board.width*.5,board.y+board.height*.45,{steps:6});await page.mouse.up();
+ await until(async()=>(await page.evaluate(screenId=>window.pteron.call('objects',{screenId}),screenId)).length===1);
+ const foreground=await page.evaluate(screenId=>window.pteron.call('objects',{screenId}),screenId);assert.ok(Number(foreground[0].attributes.width)>100);
+ await page.setViewportSize({width:800,height:560});
+ const rectangleLabel=page.locator('.layers').getByRole('button',{name:'Rectangle',exact:true});
+ await rectangleLabel.click();
+ assert.ok(await rectangleLabel.locator('span').last().evaluate(name=>name.scrollWidth<=name.clientWidth),'The default layer name fits beside its actions');
+ await tool('Motion').click();
+ await tool('Sink').click();
+ const compactSettings=page.getByRole('region',{name:'Transition settings'});
+ await compactSettings.getByRole('button',{name:'Add move path',exact:true}).waitFor();
+ const playhead=page.getByRole('slider',{name:'Playhead'});
+ await playhead.press('Home');
+ await playhead.press('ArrowUp');
+ assert.equal(await playhead.getAttribute('aria-valuenow'),'1');
+ await page.getByRole('button',{name:'Sink clip',exact:true}).press('Space');
+ assert.equal(await playhead.getAttribute('aria-valuenow'),'0');
+ assert.equal(await tool('Play').count(),1,'Space on a clip selects it without starting playback');
+ assert.ok(await compactSettings.evaluate(inspector=>{
+  const actions=inspector.querySelector('.visual-motion-actions')!.getBoundingClientRect();
+  return actions.bottom<=inspector.getBoundingClientRect().bottom;
+ }),'The basic motion actions fit in the compact inspector');
+ await writeFile(resolve(work,'verification.json'),JSON.stringify({passed:true,packaged,firstRectangle:true,canvasBackground:true,mcpBackground:true,render:process.argv.includes('--render'),shortcuts:true,clipSelection:true,spacing:true},null,2));
+ console.log('Editor workflow passed: bounded first draw, canvas/background history, shortcuts, inspector spacing and persistent timeline selection');
+}finally{await app.close();}

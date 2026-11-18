@@ -1,0 +1,49 @@
+{
+  "passed": true,
+  "frames": 445,
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "duration": 14.833333333333334,
+  "audibleNarration": true,
+  "sampledScenes": 6,
+  "audioSimilarity": [
+    {
+      "scene": 1,
+      "correlation": 0.9983160292323373,
+      "snrDb": 24.7279412826584
+    },
+    {
+      "scene": 2,
+      "correlation": 0.9981633214753989,
+      "snrDb": 24.334097529838317
+    },
+    {
+      "scene": 3,
+      "correlation": 0.9972298215910099,
+      "snrDb": 22.563589907552803
+    },
+    {
+      "scene": 4,
+      "correlation": 0.9992151942136844,
+      "snrDb": 28.028947125325416
+    },
+    {
+      "scene": 5,
+      "correlation": 0.998785380572532,
+      "snrDb": 26.05165787322814
+    },
+    {
+      "scene": 6,
+      "correlation": 0.9982426986971993,
+      "snrDb": 24.514694941477018
+    }
+  ],
+  "betweenLineSilenceSeconds": [
+    0.05666666666666664,
+    0.4133333333333331,
+    0.3700000000000001,
+    0.39000000000000057,
+    0.026666666666667282
+  ]
+}

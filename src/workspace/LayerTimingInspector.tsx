@@ -1,0 +1,11 @@
+import {Button} from '../components/ui/button';
+import {Icon} from './Icon';
+import {uuid,type LayerSpan} from '../core/model';
+import {onScrubPointerDown} from './scrubber';
+
+export function LayerTimingInspector({span,spans,fps,frame,onPut,onDelete,onReset}:{span?:LayerSpan,spans:LayerSpan[],fps:number,frame:number,onPut:(span:LayerSpan)=>unknown|Promise<unknown>,onDelete:(id:string)=>void,onReset:()=>void}){
+ return <section className="inspector layer-timing" aria-label="Layer timing settings">
+  <div className="layer-timing-row">{span&&<><label className="scrubbable-label"><span className="scrubber-handle" onPointerDown={onScrubPointerDown}>In</span><input aria-label="Layer in frame" type="number" min={0} max={span.end-1} key={`${span.id}-start-${span.start}`} defaultValue={span.start} onBlur={async event=>{const input=event.currentTarget,start=input.valueAsNumber;if(!Number.isInteger(start)||start===span.start){input.value=String(span.start);return;}const result=await onPut({...span,start});if(!result&&input.isConnected)input.value=String(span.start);}}/></label><label className="scrubbable-label"><span className="scrubber-handle" onPointerDown={onScrubPointerDown}>Out</span><input aria-label="Layer out frame" type="number" min={span.start+1} key={`${span.id}-end-${span.end}`} defaultValue={span.end} onBlur={async event=>{const input=event.currentTarget,end=input.valueAsNumber;if(!Number.isInteger(end)||end===span.end){input.value=String(span.end);return;}const result=await onPut({...span,end});if(!result&&input.isConnected)input.value=String(span.end);}}/></label></>}
+  <Button variant="ghost" className="icon-button" aria-label="Add layer range" title="Add layer range" onClick={()=>{const start=Math.max(frame,...spans.map(range=>range.end));onPut({id:uuid(),start,end:start+fps*3});}}><Icon name="plus"/></Button><Button variant="ghost" className="icon-button" aria-label="Restore automatic timing" title="Restore automatic timing" onClick={onReset}><Icon name="reset"/></Button>{span&&<Button variant="ghost" className="icon-button destructive-action" aria-label="Delete layer range and motions" title="Delete range and its motions" onClick={()=>onDelete(span.id)}><Icon name="trash"/></Button>}</div>
+ </section>;
+}

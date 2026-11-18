@@ -1,0 +1,82 @@
+================================================================================
+                    PTERON SOURCE CODE LICENSE AND EULA
+================================================================================
+
+Copyright (c) 2026, Deogenes Maranan ("Licensor").
+All rights reserved.
+
+This license governs your access to and use of the Pteron software, source code,
+build scripts, documentation, and graphical assets (collectively, the "Software").
+
+By downloading, accessing, viewing, compiling, or using the Software, you agree
+to be bound by the terms and conditions of this Agreement. If you do not agree,
+do not download, access, compile, or use the Software.
+
+--------------------------------------------------------------------------------
+1. GRANT OF LICENSE (SOURCE CODE & PERSONAL COMPILATION)
+--------------------------------------------------------------------------------
+Subject to the terms and limitations of this Agreement, Licensor grants you a
+revocable, non-exclusive, non-transferable, limited personal license to:
+  (a) View, inspect, study, and modify the source code of the Software solely
+      for personal, educational, research, or internal evaluation purposes;
+  (b) Compile the source code into executable binary form solely for your own
+      personal, internal, non-commercial use on devices owned or controlled
+      directly by you.
+
+--------------------------------------------------------------------------------
+2. RESTRICTIONS ON REDISTRIBUTION & COMMERCIALIZATION
+--------------------------------------------------------------------------------
+Except as expressly authorized under Section 1, you shall NOT:
+  (a) Distribute, publish, broadcast, sublicense, rent, lease, lend, host, or
+      otherwise convey to any third party any binary executable, precompiled
+      package, installer, container image, or derivative executable build of the
+      Software, whether free of charge or for a fee.
+  (b) Package, rebrand, or sell the Software (or any substantially derived work)
+      as a standalone product, competing application, or desktop utility.
+  (c) Provide, operate, or expose the functionality of the Software as an
+      application service provider, software-as-a-service (SaaS), hosted web
+      service, remote rendering farm, or cloud API.
+  (d) Circumvent, modify, or remove any copyright notices, license texts, or
+      proprietary marks from the source code or user interface.
+
+--------------------------------------------------------------------------------
+3. EXCLUSIVE DISTRIBUTION OF OFFICIAL PREBUILT RELEASES
+--------------------------------------------------------------------------------
+Official prebuilt installers, standalone portable executables, binary releases,
+and distributed desktop builds are packaged, signed, and distributed exclusively
+by Licensor. No third party is authorized to mirror, repackage, or distribute
+official or unofficial prebuilt binaries.
+
+--------------------------------------------------------------------------------
+4. CONTRIBUTIONS AND PULL REQUESTS
+--------------------------------------------------------------------------------
+By submitting any code, patch, pull request, documentation, or other modification
+("Contribution") to the project repository or to Licensor:
+  (a) You warrant that the Contribution is your original creation and that you
+      hold all necessary rights to convey it;
+  (b) You grant Licensor a perpetual, irrevocable, worldwide, royalty-free,
+      transferable, sublicensable license to use, modify, merge, compile,
+      distribute, and commercialize your Contribution under this License or any
+      future proprietary or commercial terms chosen by Licensor.
+
+--------------------------------------------------------------------------------
+5. THIRD-PARTY COMPONENTS
+--------------------------------------------------------------------------------
+The Software incorporates certain third-party libraries and modules licensed
+under permissive or copyleft-exempt open-source terms (including MIT, BSD,
+Apache 2.0, ISC, and LGPL). Nothing in this Agreement restricts your rights
+under the applicable third-party licenses for those specific independent modules.
+Detailed inventories and notices for third-party components are maintained in
+the THIRD_PARTY_NOTICES.md file accompanying the Software.
+
+--------------------------------------------------------------------------------
+6. DISCLAIMER OF WARRANTY & LIMITATION OF LIABILITY
+--------------------------------------------------------------------------------
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM,
+OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+================================================================================

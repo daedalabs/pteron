@@ -1,0 +1,33 @@
+import {test} from 'node:test';
+import type {Element as XmlElement} from '@xmldom/xmldom';
+import assert from 'node:assert/strict';
+import {ProjectStore} from '../src/core/store';
+import {newProject} from '../src/core/model';
+import {canvasBackground,svgObjects,parseSvg} from '../src/core/svg';
+import {encodeProject,decodeProject} from '../src/core/persistence';
+
+test('canvas background is saved vector geometry, shares history and never becomes a layer',()=>{
+ const store=new ProjectStore(newProject('Canvas',400,300)),screenId=store.snapshot.screens[0].id;
+ const command=(value:unknown)=>store.dispatch(value,store.snapshot.revision,'mcp');
+ command({type:'artwork.import',screenId,svg:'<svg xmlns="http://www.w3.org/2000/svg"><rect x="12" y="18" width="40" height="30" fill="#ff0000"/></svg>'});
+ const before=store.snapshot,objects=svgObjects(before.screens[0].svg),history=store.history.undo;
+ command({type:'canvas.background',screenId,color:'#112233'});
+ const saved=store.snapshot;
+ assert.equal(canvasBackground(saved.screens[0].svg),'#112233');
+ assert.deepEqual(svgObjects(saved.screens[0].svg),objects);
+ assert.equal(store.history.undo,history+1);
+ const background=parseSvg(saved.screens[0].svg).doc.documentElement!.firstChild as XmlElement;
+ assert.equal(background.getAttribute('width'),'400');assert.equal(background.getAttribute('height'),'300');
+ const id=background.getAttribute('id');
+ command({type:'canvas.background',screenId,color:'#ffffff'});
+ assert.equal(parseSvg(store.snapshot.screens[0].svg).doc.documentElement!.firstChild!.nodeName,'rect');
+ assert.equal((parseSvg(store.snapshot.screens[0].svg).doc.documentElement!.firstChild as XmlElement).getAttribute('id'),id);
+ command({type:'history.undo'});assert.deepEqual(store.snapshot.screens,saved.screens);
+ command({type:'project.settings',width:640,height:480,fps:30});
+ const resized=store.snapshot,rect=parseSvg(resized.screens[0].svg).doc.documentElement!.firstChild as XmlElement;
+ assert.equal(rect.getAttribute('width'),'640');assert.equal(rect.getAttribute('height'),'480');assert.equal(rect.getAttribute('id'),id);
+ assert.deepEqual(svgObjects(resized.screens[0].svg),objects);
+ assert.deepEqual(decodeProject(encodeProject(resized)),resized);
+ for(const color of ['red','#fff','url(#paint)','javascript:bad'])assert.throws(()=>command({type:'canvas.background',screenId,color}));
+ assert.deepEqual(store.snapshot,resized);
+});

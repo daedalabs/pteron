@@ -1,0 +1,37 @@
+import { z } from 'zod';
+export const id = z.string().regex(/^[a-zA-Z0-9_-]{1,100}$/);
+export const frame = z.number().int().min(0).max(1080000);
+export const presets = ['Fade','Rise','Slide','Pop','Zoom','Drift','Spin','Write on','Fade out','Sink','Slide out','Shrink','Zoom out','Drift out','Spin out','Erase','Pulse','Press','Bounce','Wiggle','Shake','Rock','Rotate','Color highlight','Outline highlight','Stagger','Smooth match','Crossfade replacement','Match terms','Highlight terms'] as const;
+export const pointSchema=z.object({x:z.number().finite(),y:z.number().finite()}).strict();
+export const matrixSchema=z.tuple([z.number().finite(),z.number().finite(),z.number().finite(),z.number().finite(),z.number().finite(),z.number().finite()]);
+export const cueSchema=z.object({id,frame,review:z.boolean(),label:z.string().max(200).optional()}).strict();
+export const markerSchema=z.object({id,frame,label:z.string().max(200).default('')}).strict();
+export const clipSchema = z.object({id,objectId:id,preset:z.enum(presets),start:frame,duration:frame.min(1),intensity:z.number().min(0).max(10).default(1),repetitions:z.number().int().min(1).max(100).default(1),direction:z.enum(['left','right','up','down']).default('up'),easing:z.enum(['linear','smooth','out']).default('smooth'),from:pointSchema.optional(),to:pointSchema.optional(),control:pointSchema.optional(),pivot:pointSchema.optional(),targetObjectId:id.optional(),match:matrixSchema.optional(),stagger:frame.optional(),terms:z.array(z.string()).max(1000).optional(),matches:z.array(z.object({objectId:id,targetObjectId:id,matrix:matrixSchema}).strict()).max(1000).optional()}).strict();
+export const captionSchema=z.object({id,sourceCaptionId:id.optional(),start:frame,end:frame,text:z.string().max(10000),draft:z.boolean().default(true),vector:z.string().optional(),vectorText:z.string().optional()}).strict();
+export const equationSchema=z.object({id,source:z.string().max(10000),terms:z.record(z.string(),z.string()),svg:z.string(),compiledSource:z.string().optional(),diagnostic:z.string().optional()}).strict();
+export const layerSpanSchema=z.object({id,start:frame,end:frame}).strict();
+export type LayerSpan=z.infer<typeof layerSpanSchema>;
+export const screenSchema=z.object({id,name:z.string().min(1).max(200),duration:frame.min(1),durationBase:frame.min(1).optional(),svg:z.string().max(10000000),clips:z.array(clipSchema).max(10000),lifetimes:z.record(z.string(),z.array(layerSpanSchema).max(1000)).default({}),captions:z.array(captionSchema).max(10000),cues:z.array(cueSchema),narration:z.object({script:z.string().max(100000),mediaId:id.optional(),duration:frame.optional(),sourceStart:frame.optional(),offset:frame.optional(),timeline:z.boolean().optional()}).strict(),links:z.record(z.string(),z.string()),equations:z.array(equationSchema)}).strict();
+export const narrationMixSchema=z.object({volume:z.number().int().min(0).max(100),muted:z.boolean()}).strict();
+export type NarrationMix=z.infer<typeof narrationMixSchema>;
+export const defaultNarrationMix:Readonly<NarrationMix>={volume:100,muted:false};
+export const captionFonts=['Arial','Georgia','Consolas'] as const;
+export const captionVariants=['Regular','Bold','Italic'] as const;
+const defaultCaptionVariant='Bold';
+export const captionEntrances=['None','Fade','Rise','Pop'] as const;
+export const captionSize={min:60,max:160,standard:100} as const;
+export const captionStyleSchema=z.object({font:z.enum(captionFonts),variant:z.enum(captionVariants).default(defaultCaptionVariant),size:z.number().int().min(captionSize.min).max(captionSize.max),entrance:z.enum(captionEntrances)}).strict();
+export type CaptionStyle=z.infer<typeof captionStyleSchema>;
+export const defaultCaptionStyle:Readonly<CaptionStyle>={font:'Arial',variant:defaultCaptionVariant,size:captionSize.standard,entrance:'None'};
+export const motionSettingsSchema=clipSchema.pick({preset:true,duration:true,intensity:true,repetitions:true,direction:true,easing:true,stagger:true});
+export const motionPresetSchema=z.object({id,name:z.string().trim().min(1).max(80),fps:z.number().int().min(1).max(120),settings:motionSettingsSchema}).strict();
+export const assetSchema=z.object({id,name:z.string().trim().min(1).max(80),fps:z.number().int().min(1).max(120),svg:z.string().max(10000000),clips:z.array(clipSchema).max(10000),lifetimes:z.record(z.string(),z.array(layerSpanSchema).max(1000)),equations:z.array(equationSchema)}).strict();
+export const projectSchema=z.object({version:z.literal(1),id,name:z.string().min(1).max(200),width:z.number().int().min(16).max(8192),height:z.number().int().min(16).max(8192),fps:z.number().int().min(1).max(120),revision:frame,narrationMix:narrationMixSchema.optional(),captionStyle:captionStyleSchema.optional(),assets:z.array(assetSchema).max(100).optional(),motionPresets:z.array(motionPresetSchema).max(100).optional(),timelineMarkers:z.array(markerSchema).max(10000).optional(),timelineCaptions:z.array(captionSchema).max(10000).optional(),timelineAudio:z.object({mediaId:id,start:frame,duration:frame.min(1),sourceStart:frame.optional(),sourceDuration:frame.min(1).optional()}).strict().optional(),screens:z.array(screenSchema).min(1).max(1000),media:z.record(z.string(),z.object({name:z.string(),type:z.enum(['audio/wav','audio/mpeg']),data:z.string().max(200000000)}).strict())}).strict();
+export type Project=z.infer<typeof projectSchema>;
+export type Screen=Project['screens'][number];
+export type Clip=z.infer<typeof clipSchema>;
+export const uuid=()=>crypto.randomUUID();
+export const blankSvg=(width:number,height:number)=>`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"></svg>`;
+export const newScreen=(width:number,height:number,name='Scene',fps=30):Screen=>({id:uuid(),name,duration:fps*3,durationBase:fps*3,svg:blankSvg(width,height),clips:[],lifetimes:{},captions:[],cues:[],narration:{script:''},links:{},equations:[]});
+export function newProject(name='Untitled',width=1080,height=1920,fps=30):Project{return projectSchema.parse({version:1,id:uuid(),name,width,height,fps,revision:0,screens:[newScreen(width,height,'Scene',fps)],media:{}});}
+

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title id="title">pteron — wing P</title>
+  <desc id="desc">A violet wing P and broad orange motion feather, drawn as editable vector paths.</desc>
+  <rect id="icon-background" x="4" y="4" width="248" height="248" rx="52" fill="#FFFFFF"/>
+  <path id="wing-p" fill="#4936B8" fill-rule="evenodd" d="M52 238.8V120C52 81 77 57 116 53C158 49 191 46 220 32C207 99 169 147 92 153V214.8L52 238.8ZM92 116C119 114 143 101 159 79C126 81 103 90 92 116Z"/>
+  <path id="motion-feather" fill="#EE623F" d="M100 162C144 155 180 136 208 104C196 144 174 165.6 148 181.2L100 210V162Z"/>
+</svg>

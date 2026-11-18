@@ -1,0 +1,97 @@
+import assert from 'node:assert/strict';
+import {mkdir} from 'node:fs/promises';
+import {resolve} from 'node:path';
+import type {Page} from 'playwright';
+
+export async function checkTimelineSelection(page:Page,output:string){
+ await mkdir(output,{recursive:true});
+ const errors:string[]=[];
+ page.on('pageerror',error=>errors.push(error.message));
+ await page.setViewportSize({width:800,height:560});
+ const state=()=>page.evaluate(()=>window.pteron.call('state'));
+ const command=async(command:unknown)=>{
+  const revision=(await state()).project.revision;
+  return page.evaluate(args=>window.pteron.call('command',args),{revision,command});
+ };
+ await command({type:'project.create',name:'Timeline selection probe',width:320,height:240});
+ const screenId=(await state()).project.screens[0].id;
+ const layerName='A deliberately long name for the foreground object';
+ await command({type:'artwork.import',screenId,svg:`<svg xmlns="http://www.w3.org/2000/svg" width="320" height="240"><rect data-name="${layerName}" width="80" height="70"/></svg>`});
+ const [layer]=await page.evaluate(screenId=>window.pteron.call('objects',{screenId}),screenId);
+ await command({type:'clip.put',screenId,clip:{id:'selection-fade',objectId:layer.id,preset:'Fade',start:4,duration:9}});
+ await command({type:'clip.put',screenId,clip:{id:'selection-slide',objectId:layer.id,preset:'Slide',start:19,duration:8}});
+ const captionText='A caption with enough words to be clipped on the timeline.';
+ await command({type:'caption.put',screenId,caption:{id:'selection-caption',start:6,end:16,text:captionText,draft:false}});
+ const before=await state();
+ const strip=page.getByRole('status',{name:'Timeline selection'});
+ const focus=page.getByRole('button',{name:'Timeline focus mode'});
+ const edit=page.getByRole('button',{name:'Edit selected',exact:true});
+ const fade=page.getByRole('button',{name:'Fade clip',exact:true});
+ const slide=page.getByRole('button',{name:'Slide clip',exact:true});
+ const caption=page.getByRole('button',{name:`Caption 1: ${captionText}`,exact:true});
+ const focusedField=(label:string)=>page.waitForFunction(label=>document.activeElement?.getAttribute('aria-label')===label,label);
+
+ await fade.click();
+ await strip.getByText('Fade',{exact:true}).waitFor();
+ await strip.getByText(layerName,{exact:true}).waitFor();
+ await strip.getByText('4–13f · 9f duration',{exact:true}).waitFor();
+ assert.equal(await edit.count(),0);
+ await focus.click();
+ await slide.click({modifiers:['Control']});
+ await strip.getByText('2 clips selected',{exact:true}).waitFor();
+ assert.equal(await edit.count(),0);
+ await slide.click({modifiers:['Control']});
+ await strip.getByText('Fade',{exact:true}).waitFor();
+ await page.screenshot({path:resolve(output,'focus-clip.png'),animations:'disabled'});
+ const playhead=page.getByRole('slider',{name:'Playhead'});
+ const frameBeforeEdit=await playhead.getAttribute('aria-valuenow');
+ await edit.press('Enter');
+ await focusedField('Start');
+ assert.equal(await focus.getAttribute('aria-pressed'),'false');
+ assert.equal(await playhead.getAttribute('aria-valuenow'),frameBeforeEdit);
+ assert.equal(await page.getByRole('spinbutton',{name:'Start',exact:true}).inputValue(),String(Number((4/30).toFixed(6))));
+
+ await focus.click();
+ await slide.dblclick();
+ await focusedField('Start');
+ assert.equal(await focus.getAttribute('aria-pressed'),'false');
+ await strip.getByText('Slide',{exact:true}).waitFor();
+ await focus.click();
+ await caption.click();
+ await strip.getByText(captionText,{exact:true}).waitFor();
+ await strip.getByText('6–16f · 10f duration',{exact:true}).waitFor();
+ await page.screenshot({path:resolve(output,'focus-caption.png'),animations:'disabled'});
+ await edit.click();
+ await focusedField('Caption text');
+ assert.equal(await focus.getAttribute('aria-pressed'),'false');
+ await focus.click();
+ await caption.dblclick();
+ await focusedField('Caption text');
+ assert.equal(await focus.getAttribute('aria-pressed'),'false');
+ assert.equal(await page.getByRole('textbox',{name:'Caption text',exact:true}).inputValue(),captionText);
+ assert.deepEqual(await state(),before,'Selecting and opening editors leaves project and undo history intact');
+
+ const captionField=page.getByRole('textbox',{name:'Caption text',exact:true});
+ await captionField.fill('Updated caption');
+ await captionField.press('Tab');
+ await page.waitForFunction(async()=> (await window.pteron.call('state')).project.screens[0].captions[0].text==='Updated caption');
+ assert.equal((await state()).history.undo,before.history.undo+1);
+ await strip.getByText('Updated caption',{exact:true}).waitFor();
+
+ await command({type:'screen.add',afterScreenId:screenId,name:'Second scene'});
+ const second=(await state()).project.screens[1];
+ const [continued]=await page.evaluate(screenId=>window.pteron.call('objects',{screenId}),second.id);
+ await command({type:'clip.put',screenId:second.id,clip:{id:'selection-rise',objectId:continued.id,preset:'Rise',start:3,duration:5}});
+ const sequence=await state();
+ const offset=sequence.project.screens[0].duration;
+ await page.getByRole('button',{name:'Show Main timeline'}).click();
+ await focus.click();
+ await page.getByRole('button',{name:'Expand Second scene in timeline',exact:true}).click();
+ await page.getByRole('button',{name:'Rise clip',exact:true}).dblclick();
+ await focusedField('Start');
+ await strip.getByText(`${offset+3}–${offset+8}f · 5f duration`,{exact:true}).waitFor();
+ assert.equal(await page.getByRole('spinbutton',{name:'Start',exact:true}).inputValue(),'0.1');
+ assert.deepEqual(await state(),sequence,'Main opens the owning scene’s clip with local editor timing');
+ assert.ok(await page.evaluate(()=>innerWidth===800&&innerHeight===560&&document.documentElement.scrollWidth<=innerWidth));
+ assert.deepEqual(errors,[]);
+}

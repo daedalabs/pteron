@@ -1,0 +1,17 @@
+<!doctype html>
+<html><head><meta charset="UTF-8"><title>pteron SVG feasibility gate</title></head>
+<body style="margin:0;background:#000"><div id="editor" style="width:320px;height:480px"></div>
+<script type="module">
+import SvgCanvas from '@svgedit/svgcanvas';
+import {loadProjectSvg,saveProjectSvg,prepareSvg,restoreProjectIds} from '/src/editor/svg-adapter.js';
+window.adapter={loadProjectSvg,saveProjectSvg,prepareSvg,restoreProjectIds};
+window.gateReady = false;
+try {
+ window.canvas = new SvgCanvas(document.querySelector('#editor'), {
+  dimensions:[320,480],baseUnit:'px',imgPath:'',initFill:{color:'ffffff',opacity:1},
+  initStroke:{color:'none',opacity:1,width:0},initOpacity:1,
+  text:{font_size:24,font_family:'Arial',stroke_width:0},show_outside_canvas:false
+ });
+ window.gateReady = true;
+} catch(error) {window.gateError = error.stack;}
+</script></body></html>

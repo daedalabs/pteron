@@ -1,0 +1,2 @@
+import { contextBridge, ipcRenderer } from 'electron';
+contextBridge.exposeInMainWorld('pteron',{call:(method:string,args:unknown)=>ipcRenderer.invoke('pteron',method,args),subscribe:(callback:()=>void)=>{const listener=()=>callback();ipcRenderer.on('pteron:change',listener);return ()=>ipcRenderer.removeListener('pteron:change',listener);},onAction:(callback:(action:string)=>void)=>{const listener=(_event:unknown,action:string)=>callback(action);ipcRenderer.on('pteron:action',listener);return ()=>ipcRenderer.removeListener('pteron:action',listener);}});

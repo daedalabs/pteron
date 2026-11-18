@@ -1,0 +1,38 @@
+appId: tech.daedalab.pteron
+productName: pteron
+electronDist: node_modules/electron/dist
+directories:
+  output: artifacts/standalone
+files:
+  - dist/**/*
+  - package.json
+extraResources:
+  - from: dist/mcp.cjs
+    to: mcp.cjs
+  - from: artifacts/standalone-runtime/pteron-worker
+    to: worker
+  - from: examples
+    to: examples
+    filter:
+      - '*.pteron'
+      - 'small-idea.json'
+      - 'README.md'
+  - from: artifacts/standalone-notices
+    to: notices
+win:
+  target: dir
+  icon: public/pteron.ico
+  signExecutable: false
+asar: true
+npmRebuild: false
+portable:
+  artifactName: '${productName}-${version}-portable.${ext}'
+  splashImage: build/splash.bmp
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: always
+  createStartMenuShortcut: true
+  shortcutName: pteron
+  artifactName: '${productName}-${version}-setup.${ext}'
+  uninstallDisplayName: '${productName}'

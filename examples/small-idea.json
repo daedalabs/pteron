@@ -1,0 +1,116 @@
+{
+  "name": "Small idea, big motion",
+  "screens": [
+    {
+      "name": "Spark",
+      "frames": 41,
+      "clips": 6,
+      "captions": 1,
+      "captionCues": [
+        {
+          "text": "Start with a simple shape,",
+          "start": 2,
+          "end": 39
+        }
+      ],
+      "script": "Start with a simple shape,"
+    },
+    {
+      "name": "Build",
+      "frames": 82,
+      "clips": 6,
+      "captions": 2,
+      "captionCues": [
+        {
+          "text": "then add a stem",
+          "start": 4,
+          "end": 33
+        },
+        {
+          "text": "and a couple of leaves.",
+          "start": 41,
+          "end": 78
+        }
+      ],
+      "script": "then add a stem and a couple of leaves."
+    },
+    {
+      "name": "Rhythm",
+      "frames": 66,
+      "clips": 7,
+      "captions": 2,
+      "captionCues": [
+        {
+          "text": "Give each piece",
+          "start": 6,
+          "end": 32
+        },
+        {
+          "text": "its own timing.",
+          "start": 32,
+          "end": 62
+        }
+      ],
+      "script": "Give each piece its own timing."
+    },
+    {
+      "name": "Together",
+      "frames": 108,
+      "clips": 5,
+      "captions": 3,
+      "captionCues": [
+        {
+          "text": "You can move the whole group",
+          "start": 6,
+          "end": 42
+        },
+        {
+          "text": "while the details keep moving",
+          "start": 42,
+          "end": 84
+        },
+        {
+          "text": "on their own.",
+          "start": 84,
+          "end": 103
+        }
+      ],
+      "script": "You can move the whole group while the details keep moving on their own."
+    },
+    {
+      "name": "Story",
+      "frames": 44,
+      "clips": 7,
+      "captions": 1,
+      "captionCues": [
+        {
+          "text": "Bring the scenes together,",
+          "start": 6,
+          "end": 42
+        }
+      ],
+      "script": "Bring the scenes together,"
+    },
+    {
+      "name": "Bloom",
+      "frames": 104,
+      "clips": 5,
+      "captions": 2,
+      "captionCues": [
+        {
+          "text": "add a little sound,",
+          "start": 4,
+          "end": 35
+        },
+        {
+          "text": "and it's ready to share.",
+          "start": 46,
+          "end": 93
+        }
+      ],
+      "script": "add a little sound, and it's ready to share."
+    }
+  ],
+  "totalFrames": 445,
+  "source": "Original editable vector showcase. Original script, Ava neural narration via Microsoft Edge speech. No external project or provider service required."
+}

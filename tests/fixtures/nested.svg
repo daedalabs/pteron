@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="480" viewBox="0 0 320 480">
+  <svg id="nested-viewport" x="40" y="80" width="200" height="100" viewBox="0 0 100 50">
+    <g id="artwork" fill="#ff4444">
+      <g id="rectangle"><rect x="10" y="10" width="20" height="10"/></g>
+      <g id="circle"><circle cx="65" cy="25" r="10" fill="#44bbff"/></g>
+    </g>
+  </svg>
+</svg>

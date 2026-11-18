@@ -1,0 +1,345 @@
+{
+  "voice": "en-US-AvaMultilingualNeural",
+  "rate": "+0%",
+  "connectedTake": true,
+  "scenes": [
+    {
+      "script": "Start with a simple shape,",
+      "frames": 41,
+      "captions": [
+        {
+          "text": "Start with a simple shape,",
+          "start": 2,
+          "end": 39
+        }
+      ],
+      "words": [
+        {
+          "text": "Start",
+          "start": 2,
+          "end": 10
+        },
+        {
+          "text": "with",
+          "start": 10,
+          "end": 14
+        },
+        {
+          "text": "a",
+          "start": 14,
+          "end": 15
+        },
+        {
+          "text": "simple",
+          "start": 15,
+          "end": 26
+        },
+        {
+          "text": "shape,",
+          "start": 26,
+          "end": 38
+        }
+      ]
+    },
+    {
+      "script": "then add a stem and a couple of leaves.",
+      "frames": 82,
+      "captions": [
+        {
+          "text": "then add a stem",
+          "start": 4,
+          "end": 33
+        },
+        {
+          "text": "and a couple of leaves.",
+          "start": 41,
+          "end": 78
+        }
+      ],
+      "words": [
+        {
+          "text": "then",
+          "start": 4,
+          "end": 11
+        },
+        {
+          "text": "add",
+          "start": 11,
+          "end": 16
+        },
+        {
+          "text": "a",
+          "start": 16,
+          "end": 17
+        },
+        {
+          "text": "stem",
+          "start": 17,
+          "end": 32
+        },
+        {
+          "text": "and",
+          "start": 41,
+          "end": 47
+        },
+        {
+          "text": "a",
+          "start": 48,
+          "end": 49
+        },
+        {
+          "text": "couple",
+          "start": 49,
+          "end": 58
+        },
+        {
+          "text": "of",
+          "start": 58,
+          "end": 60
+        },
+        {
+          "text": "leaves.",
+          "start": 61,
+          "end": 77
+        }
+      ]
+    },
+    {
+      "script": "Give each piece its own timing.",
+      "frames": 66,
+      "captions": [
+        {
+          "text": "Give each piece",
+          "start": 6,
+          "end": 32
+        },
+        {
+          "text": "its own timing.",
+          "start": 32,
+          "end": 62
+        }
+      ],
+      "words": [
+        {
+          "text": "Give",
+          "start": 6,
+          "end": 11
+        },
+        {
+          "text": "each",
+          "start": 13,
+          "end": 21
+        },
+        {
+          "text": "piece",
+          "start": 21,
+          "end": 31
+        },
+        {
+          "text": "its",
+          "start": 32,
+          "end": 37
+        },
+        {
+          "text": "own",
+          "start": 37,
+          "end": 44
+        },
+        {
+          "text": "timing.",
+          "start": 44,
+          "end": 61
+        }
+      ]
+    },
+    {
+      "script": "You can move the whole group while the details keep moving on their own.",
+      "frames": 108,
+      "captions": [
+        {
+          "text": "You can move the whole group",
+          "start": 6,
+          "end": 42
+        },
+        {
+          "text": "while the details keep moving",
+          "start": 42,
+          "end": 84
+        },
+        {
+          "text": "on their own.",
+          "start": 84,
+          "end": 103
+        }
+      ],
+      "words": [
+        {
+          "text": "You",
+          "start": 6,
+          "end": 9
+        },
+        {
+          "text": "can",
+          "start": 9,
+          "end": 13
+        },
+        {
+          "text": "move",
+          "start": 13,
+          "end": 21
+        },
+        {
+          "text": "the",
+          "start": 21,
+          "end": 24
+        },
+        {
+          "text": "whole",
+          "start": 24,
+          "end": 31
+        },
+        {
+          "text": "group",
+          "start": 32,
+          "end": 42
+        },
+        {
+          "text": "while",
+          "start": 42,
+          "end": 47
+        },
+        {
+          "text": "the",
+          "start": 47,
+          "end": 49
+        },
+        {
+          "text": "details",
+          "start": 50,
+          "end": 67
+        },
+        {
+          "text": "keep",
+          "start": 68,
+          "end": 74
+        },
+        {
+          "text": "moving",
+          "start": 74,
+          "end": 84
+        },
+        {
+          "text": "on",
+          "start": 84,
+          "end": 87
+        },
+        {
+          "text": "their",
+          "start": 88,
+          "end": 92
+        },
+        {
+          "text": "own.",
+          "start": 93,
+          "end": 102
+        }
+      ]
+    },
+    {
+      "script": "Bring the scenes together,",
+      "frames": 44,
+      "captions": [
+        {
+          "text": "Bring the scenes together,",
+          "start": 6,
+          "end": 42
+        }
+      ],
+      "words": [
+        {
+          "text": "Bring",
+          "start": 6,
+          "end": 11
+        },
+        {
+          "text": "the",
+          "start": 12,
+          "end": 14
+        },
+        {
+          "text": "scenes",
+          "start": 14,
+          "end": 26
+        },
+        {
+          "text": "together,",
+          "start": 26,
+          "end": 41
+        }
+      ]
+    },
+    {
+      "script": "add a little sound, and it's ready to share.",
+      "frames": 104,
+      "captions": [
+        {
+          "text": "add a little sound,",
+          "start": 4,
+          "end": 35
+        },
+        {
+          "text": "and it's ready to share.",
+          "start": 46,
+          "end": 93
+        }
+      ],
+      "words": [
+        {
+          "text": "add",
+          "start": 4,
+          "end": 10
+        },
+        {
+          "text": "a",
+          "start": 10,
+          "end": 11
+        },
+        {
+          "text": "little",
+          "start": 12,
+          "end": 20
+        },
+        {
+          "text": "sound,",
+          "start": 20,
+          "end": 34
+        },
+        {
+          "text": "and",
+          "start": 46,
+          "end": 60
+        },
+        {
+          "text": "it's",
+          "start": 63,
+          "end": 68
+        },
+        {
+          "text": "ready",
+          "start": 68,
+          "end": 76
+        },
+        {
+          "text": "to",
+          "start": 76,
+          "end": 78
+        },
+        {
+          "text": "share.",
+          "start": 78,
+          "end": 92
+        }
+      ]
+    }
+  ]
+}

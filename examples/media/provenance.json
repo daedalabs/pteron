@@ -1,0 +1,13 @@
+{
+  "voice": "en-US-AvaMultilingualNeural",
+  "service": "Microsoft Edge speech",
+  "developmentTool": "edge-tts 7.3.1",
+  "rate": "+0%",
+  "format": "PCM signed 16-bit mono, 48000 Hz",
+  "generated": "2026-11-02",
+  "script": "Start with a simple shape, then add a stem and a couple of leaves. Give each piece its own timing. You can move the whole group while the details keep moving on their own. Bring the scenes together, add a little sound, and it's ready to share.",
+  "runtime": "Committed WAV assets. No network, service account, TTS package or speech provider required to use the sample.",
+  "releaseStatus": "Provider output permissions remain part of the unfinished public-release audit.",
+  "connectedTake": true,
+  "captionTiming": "WordBoundary metadata; phrase cues rounded to the output frame"
+}

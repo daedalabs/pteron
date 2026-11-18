@@ -1,0 +1,17 @@
+import type {LayerSpan,Screen} from '../core/model';
+
+export function LayerRange({screen,objectId,name,span,selected,onSelect,onChange,onSeek,snap}:{snap?:(frame:number)=>number,screen:Screen,objectId:string,name:string,span:LayerSpan,selected:boolean,onSelect:()=>void,onSeek:(frame:number)=>void,onChange:(span:LayerSpan,moveClips:boolean)=>void}){
+ return <div className={`layer-range ${selected?'selected':''}`} data-span-id={span.id} role="button" tabIndex={0} aria-label={`${name} visibility range · ${span.start}–${span.end}`} title={`${name} · ${span.start}–${span.end} · drag edges to trim, drag the band to move layer and motions`} style={{left:`${span.start/screen.duration*100}%`,width:`${(span.end-span.start)/screen.duration*100}%`}}
+  onKeyDown={event=>{if(event.key==='Enter'){event.preventDefault();onSelect();}else if(event.key==='ArrowLeft'||event.key==='ArrowRight'){event.preventDefault();onSelect();const delta=event.key==='ArrowLeft'?-1:1;if(span.start+delta>=0&&span.end+delta<=screen.duration)onChange({...span,start:span.start+delta,end:span.end+delta},true);}}}
+  onPointerDown={event=>{
+   if(event.button!==0)return;event.preventDefault();event.stopPropagation();onSelect();const target=event.currentTarget,lane=target.parentElement!,edge=(event.target as HTMLElement).dataset.edge,startX=event.clientX,scale=screen.duration/lane.clientWidth;
+   const clips=screen.clips.filter(clip=>clip.objectId===objectId&&clip.start>=span.start&&clip.start+clip.duration<=span.end).map(clip=>({clip,element:lane.querySelector<HTMLElement>(`[data-clip-id="${CSS.escape(clip.id)}"]`)}));
+   target.setPointerCapture(event.pointerId);
+   const candidate=(x:number)=>{const input=Math.round((x-startX)*scale),edgeFrame=edge==='end'?span.end:span.start,raw=event.altKey||!snap?input:snap(edgeFrame+input)-edgeFrame,delta=Math.max(-span.start,Math.min(screen.duration-span.end,raw));return edge==='start'?{...span,start:Math.max(0,Math.min(span.end-1,span.start+raw))}:edge==='end'?{...span,end:Math.max(span.start+1,Math.min(screen.duration,span.end+raw))}:{...span,start:span.start+delta,end:span.end+delta};};
+   const restore=()=>{target.style.left=`${span.start/screen.duration*100}%`;target.style.width=`${(span.end-span.start)/screen.duration*100}%`;for(const {clip,element} of clips)if(element)element.style.left=`${clip.start/screen.duration*100}%`;};
+   const cleanup=()=>{target.removeEventListener('pointermove',move);target.removeEventListener('pointerup',finish);target.removeEventListener('pointercancel',cancel);};
+   const move=(ev:PointerEvent)=>{const next=candidate(ev.clientX);target.style.left=`${next.start/screen.duration*100}%`;target.style.width=`${(next.end-next.start)/screen.duration*100}%`;if(!edge)for(const {clip,element} of clips)if(element)element.style.left=`${(clip.start+next.start-span.start)/screen.duration*100}%`;};
+   const finish=(ev:PointerEvent)=>{const next=candidate(ev.clientX);cleanup();restore();if(next.start!==span.start||next.end!==span.end)onChange(next,!edge);else if(!edge){const box=lane.getBoundingClientRect();onSeek(Math.max(0,Math.min(screen.duration-1,Math.round((ev.clientX-box.left)/box.width*screen.duration))));}};
+   const cancel=()=>{cleanup();restore();};target.addEventListener('pointermove',move);target.addEventListener('pointerup',finish);target.addEventListener('pointercancel',cancel);
+  }}><span className="range-handle range-start" data-edge="start" aria-hidden="true"/><span className="range-handle range-end" data-edge="end" aria-hidden="true"/></div>;
+}
