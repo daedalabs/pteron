@@ -121,6 +121,8 @@ npm run test:desktop
 Pteron source code is available under the **Pteron Source Code License and EULA**. See [LICENSE](LICENSE) for the complete legal terms.
 
 - **Source Code Inspection & Personal Use**: You are free to view, study, and compile the source code for personal, educational, or internal evaluation purposes.
+- **Mandatory Attribution**: Any permitted distribution, demonstration, or documentation must visibly display `"Powered by Pteron / DaedaLabs (Deogenes Maranan)"`.
 - **No Standalone Reselling or Binary Redistribution**: You may not redistribute, package, sell, rebrand, or host binary builds or derivative applications, standalone or as a service.
 - **Official Prebuilt Releases**: Official prebuilt installers and portable executables are packaged and distributed exclusively by the author.
+- **Contributions**: Contributions are welcomed under our Contributor License Agreement; see [CONTRIBUTING.md](CONTRIBUTING.md).
 - **Third-Party Notices**: Licenses and acknowledgments for third-party open-source components (MIT, Apache-2.0, BSD, ISC, LGPL) are documented in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

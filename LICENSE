@@ -2,7 +2,7 @@
                     PTERON SOURCE CODE LICENSE AND EULA
 ================================================================================
 
-Copyright (c) 2026, Deogenes Maranan ("Licensor").
+Copyright (c) 2026, Deogenes Maranan ("Licensor") / DaedaLabs.
 All rights reserved.
 
 This license governs your access to and use of the Pteron software, source code,
@@ -40,7 +40,21 @@ Except as expressly authorized under Section 1, you shall NOT:
       proprietary marks from the source code or user interface.
 
 --------------------------------------------------------------------------------
-3. EXCLUSIVE DISTRIBUTION OF OFFICIAL PREBUILT RELEASES
+3. MANDATORY ATTRIBUTION REQUIREMENTS
+--------------------------------------------------------------------------------
+Any permitted distribution, authorized demonstration, public fork, research
+publication, or documentation that references, embeds, links to, or showcases
+the Software (or any substantially derived work) must prominently display visible
+attribution to Licensor:
+  (a) In user-facing documentation, "About" screens, interface footers, or credit
+      notices, using the exact text:
+      "Powered by Pteron / DaedaLabs (Deogenes Maranan)"
+  (b) In source code distributions, all copyright notices and this license
+      agreement must remain intact and unaltered in all copies or substantial
+      portions of the Software.
+
+--------------------------------------------------------------------------------
+4. EXCLUSIVE DISTRIBUTION OF OFFICIAL PREBUILT RELEASES
 --------------------------------------------------------------------------------
 Official prebuilt installers, standalone portable executables, binary releases,
 and distributed desktop builds are packaged, signed, and distributed exclusively
@@ -48,19 +62,31 @@ by Licensor. No third party is authorized to mirror, repackage, or distribute
 official or unofficial prebuilt binaries.
 
 --------------------------------------------------------------------------------
-4. CONTRIBUTIONS AND PULL REQUESTS
+5. CONTRIBUTIONS AND PULL REQUESTS
 --------------------------------------------------------------------------------
 By submitting any code, patch, pull request, documentation, or other modification
 ("Contribution") to the project repository or to Licensor:
   (a) You warrant that the Contribution is your original creation and that you
       hold all necessary rights to convey it;
   (b) You grant Licensor a perpetual, irrevocable, worldwide, royalty-free,
-      transferable, sublicensable license to use, modify, merge, compile,
-      distribute, and commercialize your Contribution under this License or any
-      future proprietary or commercial terms chosen by Licensor.
+      transferable, assignable, fully sublicensable license to use, modify, merge,
+      compile, reproduce, publish, relicense, commercialize, or archive your
+      Contribution under this License or under any other proprietary, open-source,
+      or commercial terms chosen by Licensor, without obligation or compensation
+      to you.
 
 --------------------------------------------------------------------------------
-5. THIRD-PARTY COMPONENTS
+6. RESERVATION OF RIGHTS & ARCHIVAL
+--------------------------------------------------------------------------------
+Licensor expressly reserves all rights not explicitly granted herein. Licensor
+retains the sole, exclusive right to:
+  (a) Archive, deprecate, or cease development and public maintenance of the
+      repository at any time;
+  (b) Release future updates, releases, or derivative editions under different,
+      updated, or fully closed/proprietary licensing terms.
+
+--------------------------------------------------------------------------------
+7. THIRD-PARTY COMPONENTS
 --------------------------------------------------------------------------------
 The Software incorporates certain third-party libraries and modules licensed
 under permissive or copyleft-exempt open-source terms (including MIT, BSD,
@@ -70,7 +96,7 @@ Detailed inventories and notices for third-party components are maintained in
 the THIRD_PARTY_NOTICES.md file accompanying the Software.
 
 --------------------------------------------------------------------------------
-6. DISCLAIMER OF WARRANTY & LIMITATION OF LIABILITY
+8. DISCLAIMER OF WARRANTY & LIMITATION OF LIABILITY
 --------------------------------------------------------------------------------
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
